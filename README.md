@@ -6,18 +6,24 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-`culturalEvolution` provides a set of convenient functions for models of
-cultural evolution and/or diffusion processes.
+**`culturalEvolution`** provides a set of convenient functions for
+models of cultural evolution and/or diffusion processes.
 
 ## Installation
 
-You can install the development version of culturalEvolution from
+You can install the development version of **`culturalEvolution`** from
 [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("acastroaraujo/culturalEvolution")
 ```
+
+Currently available functions:
+
+- `recursion()`
+
+- `multi_par_call()`
 
 ## Recursion
 
@@ -57,7 +63,7 @@ str(out)
 plot(out, type = "l")
 ```
 
-<img src="man/figures/README-env-learn-1.png" width="100%" />
+<img src="man/figures/README-recursion-example-1.png" width="100%" />
 
 ``` r
 
@@ -78,7 +84,7 @@ out <- biased_transmission(
 plot(out, type = "l")
 ```
 
-<img src="man/figures/README-env-learn-2.png" width="100%" />
+<img src="man/figures/README-recursion-example-2.png" width="100%" />
 
 Every recursive function will check that the supplied list of parameters
 corresponds to this expression.
@@ -133,7 +139,7 @@ out <- multi_par_call(grid, comb_mod, q_init = 0, tn = 150)
 
 str(out)
 #> 'data.frame':    755 obs. of  7 variables:
-#>  $ .id: chr  "1" "1" "1" "1" ...
+#>  $ .id: Factor w/ 5 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
 #>  $ t  : int  0 1 2 3 4 5 6 7 8 9 ...
 #>  $ q  : num  0 0.006 0.0125 0.0196 0.0274 ...
 #>  $ a  : num  0 0 0 0 0 0 0 0 0 0 ...
@@ -147,10 +153,11 @@ out |>
   ggplot(aes(t, q, group = .id, color = factor(a))) + 
   geom_line() + 
   geom_hline(yintercept = 1, linetype = "dashed", color = "grey50") +
-  labs(color = "alpha")
+  labs(color = "alpha") + 
+  theme_bw()
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-multi-par-example-1.png" width="100%" />
 
 ## References
 

@@ -20,16 +20,22 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-`culturalEvolution` provides a set of convenient functions for models of cultural evolution and/or diffusion processes.
+**`culturalEvolution`** provides a set of convenient functions for models of cultural evolution and/or diffusion processes.
 
 ## Installation
 
-You can install the development version of culturalEvolution from [GitHub](https://github.com/) with:
+You can install the development version of **`culturalEvolution`** from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("acastroaraujo/culturalEvolution")
 ```
+
+Currently available functions:
+
+-   `recursion()`
+
+-   `multi_par_call()`
 
 ## Recursion
 
@@ -41,7 +47,7 @@ You can construct *any* model with the `recursion()` function and a mathematical
 
 Here are two very simple models from @henrich2001:
 
-```{r env-learn}
+```{r recursion-example}
 
 env_learn <- recursion(
   expr = q + (1 - q)*P1 - q*P2
@@ -101,7 +107,7 @@ The `multi_par_call()` allows us to pass lists of parameters in the form of data
 
 Here we replicate Figure 11 in @henrich2001 [pp. 1006]:
 
-```{r}
+```{r multi-par-example}
 comb_mod <- recursion(
   expr = q + 0.5*(P1 + (L-1)*q) + 0.5*q*(1-q)*(b*(1 - a) + a*(2*q - 1))
 )
@@ -125,7 +131,8 @@ out |>
   ggplot(aes(t, q, group = .id, color = factor(a))) + 
   geom_line() + 
   geom_hline(yintercept = 1, linetype = "dashed", color = "grey50") +
-  labs(color = "alpha")
+  labs(color = "alpha") + 
+  theme_bw()
 ```
 
 ## References
