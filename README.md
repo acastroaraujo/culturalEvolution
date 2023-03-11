@@ -25,6 +25,10 @@ devtools::install_github("acastroaraujo/culturalEvolution")
 library(culturalEvolution)
 ```
 
+You can construct *any* model with the `recursion()` function and a
+mathematical expression. Each new models is a function of class
+“recursion.”
+
 Here are two very simple models from Henrich (2001):
 
 ``` r
@@ -76,11 +80,12 @@ plot(out, type = "l")
 
 <img src="man/figures/README-env-learn-2.png" width="100%" />
 
-As you can see, you can construct any model with a mathematical
-expression. Every recursive function will check that the supplied list
-of parameters corresponds to this expression.
+Every recursive function will check that the supplied list of parameters
+corresponds to this expression.
 
 For example:
+
+- Missing parameters:
 
 ``` r
 out <- biased_transmission(
@@ -89,7 +94,7 @@ out <- biased_transmission(
 #> Error: Missing Parameters: B
 ```
 
-`q` cannot be supplied as a parameter:
+- `q` cannot be supplied as a parameter:
 
 ``` r
 out <- env_learn(

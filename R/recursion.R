@@ -71,6 +71,7 @@ multi_par_call <- function(grid, model, q_init = 0, tn = 20) {
   )
   out <- purrr::map2(multi_out, parameter_list, dplyr::bind_cols)
   out <- dplyr::bind_rows(out, .id = ".id")
+  out[[".id"]] <- as.factor(out[[".id"]])
   attr(out, "params") <- NULL
   return(out)
 }
