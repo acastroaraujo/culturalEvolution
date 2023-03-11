@@ -45,7 +45,7 @@ library(culturalEvolution)
 
 You can construct *any* model with the `recursion()` function and a mathematical expression.
 
-Each of these models is a new function of class "recursion."
+Each of these models is a *new* function of class "recursion."
 
 Here are two very simple models from @henrich2001:
 

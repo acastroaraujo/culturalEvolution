@@ -34,7 +34,7 @@ library(culturalEvolution)
 You can construct *any* model with the `recursion()` function and a
 mathematical expression.
 
-Each of these models is a new function of class “recursion.”
+Each of these models is a *new* function of class “recursion.”
 
 Here are two very simple models from Henrich (2001):
 
@@ -45,8 +45,11 @@ env_learn <- recursion(
 )
 
 env_learn ## special print
-#> Equation:
+#> Recursive equation:
 #> q' = q + (1 - q) * P1 - q * P2
+#> 
+#> Parameters:
+#> P1, P2
 
 out <- env_learn(
   params = list(P1 = 0.308, P2 = 0.062), 
@@ -73,8 +76,11 @@ biased_transmission <- recursion(
 )
 
 biased_transmission ## special print
-#> Equation:
+#> Recursive equation:
 #> q' = q + q * (1 - q) * B
+#> 
+#> Parameters:
+#> B
 
 out <- biased_transmission(
   params = list(B = 0.1), 

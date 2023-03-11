@@ -12,8 +12,9 @@
 #'
 recursion <- function(expr) {
   expr <- substitute(expr)
+  par_names <- extract_par_names(expr)
   fun <- function(params, q_init = 0, tn = 20, ...) {
-    validate_recursion_env(environment(), expr)
+    validate_recursion_env(environment(), par_names)
     list2env(params, envir = environment())
     out <- purrr::accumulate(
       .x = 1:tn,        ## sequence of time periods
@@ -29,8 +30,12 @@ recursion <- function(expr) {
 #'
 print.recursion <- function(x, ...) {
   eq <- environment(x)[["expr"]]
-  cat("Equation:\n")
-  cat("q' =", paste0(deparse(eq), sep = "\n"))
+  params <- environment(x)[["par_names"]]
+  i <- which(params == "q")
+  cat("Recursive equation:\n")
+  cat("q' =", paste0(deparse(eq), sep = "\n\n"))
+  cat("Parameters:\n")
+  cat(params[-i], sep = ", ")
 }
 
 
@@ -92,8 +97,7 @@ extract_par_names <- function(expr) {
   return(as.character(s[i]))
 }
 
-validate_recursion_env <- function(e, expr) {
-  par_names <- extract_par_names(expr)
+validate_recursion_env <- function(e, par_names) {
   ok <- par_names %in% names(append(e[["params"]], list(q = NULL)))
   if ("q" %in% names(e[["params"]])) {
     stop("The \"params\" list cannot contain an object named \"q\"", call. = FALSE)
@@ -107,4 +111,5 @@ validate_recursion_env <- function(e, expr) {
   if (e[["q_init"]] < 0 | e[["q_init"]] > 1) {
     stop("\"q_init\" must not be outside the [0, 1] range", call. = FALSE)
   }
+
 }
