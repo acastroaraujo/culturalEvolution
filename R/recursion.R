@@ -1,9 +1,20 @@
 
+#' Create Recursive Models
+#'
+#' @param expr a mathematical expression
+#'
+#' @return a function of class "recursion."
+#' @export
+#'
+#' @examples
+#' biased_transmission <- recursion(expr = q + q*(1 - q)*B)
+#' biased_transmission
+#'
 recursion <- function(expr) {
   expr <- substitute(expr)
   fun <- function(params, q_init = 0, tn = 20, ...) {
-    safety_check(environment(), expr)
-    list2env(params, env = environment())
+    validate_recursion_env(environment(), expr)
+    list2env(params, envir = environment())
     out <- purrr::accumulate(
       .x = 1:tn,        ## sequence of time periods
       .init = q_init,   ## initial value for q
@@ -14,7 +25,8 @@ recursion <- function(expr) {
   structure(fun, class = c("recursion", "function"))
 }
 
-
+#' @export
+#'
 print.recursion <- function(x, ...) {
   eq <- environment(x)[["expr"]]
   cat("Equation:\n")
@@ -22,6 +34,28 @@ print.recursion <- function(x, ...) {
 }
 
 
+#' Run Recursive Model with Multiple Parameters
+#'
+#' @param grid a data frame of parameter values
+#' @param model a function of class "recursion."
+#' @param q_init the initial value for "q" (default is zero).
+#' @param tn the number of time periods after q_0
+#'
+#' @return a data frame with parameters t, q, .id, and whatever parameters where used
+#' @export
+#'
+#' @examples
+#'
+#' env_learn <- recursion(
+#'   expr = P1 + L*q
+#' )
+#'
+#' env_learn
+#'
+#' grid <- expand.grid(P1 = seq(0, 0.5, by  = 0.1), L = seq(0.5, 1, by = 0.1))
+#'
+#' multi_par_call(grid, env_learn)
+#'
 multi_par_call <- function(grid, model, q_init = 0, tn = 20) {
 
   if (!("data.frame" %in% class(grid))) stop("grid must be a data frame.")
@@ -36,8 +70,9 @@ multi_par_call <- function(grid, model, q_init = 0, tn = 20) {
     }
   )
   out <- purrr::map2(multi_out, parameter_list, dplyr::bind_cols)
-
-  return(dplyr::bind_rows(out, .id = ".g"))
+  out <- dplyr::bind_rows(out, .id = ".id")
+  attr(out, "params") <- NULL
+  return(out)
 }
 
 get_expression_tree <- function(expr) {
@@ -48,7 +83,7 @@ get_leafs <- function(tree) {
   purrr::map_if(tree[-1], is.list, get_leafs)
 }
 
-extract_names <- function(expr) {
+extract_par_names <- function(expr) {
   tree <- get_expression_tree(expr)
   s <- get_leafs(tree)
   s <- unique(unlist(s))
@@ -56,14 +91,14 @@ extract_names <- function(expr) {
   return(as.character(s[i]))
 }
 
-safety_check <- function(e, expr) {
-  par_names <- extract_names(expr)
+validate_recursion_env <- function(e, expr) {
+  par_names <- extract_par_names(expr)
   ok <- par_names %in% names(append(e[["params"]], list(q = NULL)))
+  if ("q" %in% names(e[["params"]])) {
+    stop("The \"params\" list cannot contain an object named \"q\"", call. = FALSE)
+  }
   if (!all(ok)) {
     stop("Missing Parameters: ", paste(par_names[!ok], collapse = ", "), call. = FALSE)
-  }
-  if ("q" %in% names(e[["params"]])) {
-    stop("\"params\" can't contain an object named \"q\"", call. = FALSE)
   }
   if (e[["tn"]] %% 1 != 0 | e[["tn"]] < 0) {
     stop("\"tn\" must be a positive integer", call. = FALSE)

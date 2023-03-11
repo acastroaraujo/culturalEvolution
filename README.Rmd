@@ -1,0 +1,127 @@
+---
+output: github_document
+bibliography: references.bib
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# culturalEvolution
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+`culturalEvolution` provides a set of convenient functions for models of cultural evolution and/or diffusion processes.
+
+## Installation
+
+You can install the development version of culturalEvolution from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("acastroaraujo/culturalEvolution")
+```
+
+## Recursion
+
+```{r setup}
+library(culturalEvolution)
+```
+
+Here are two very simple models from @henrich2001:
+
+```{r env-learn}
+
+env_learn <- recursion(
+  expr = q + (1 - q)*P1 - q*P2
+)
+
+env_learn ## special print
+
+out <- env_learn(
+  params = list(P1 = 0.308, P2 = 0.062), 
+  tn = 100
+)
+
+str(out)
+
+plot(out, type = "l")
+
+biased_transmission <- recursion(
+  expr = q + q*(1 - q)*B
+)
+
+biased_transmission ## special print
+
+out <- biased_transmission(
+  params = list(B = 0.1), 
+  q_init = 0.005,  ## q cannot start as zero in this model!
+  tn = 100
+)
+
+plot(out, type = "l")
+
+```
+
+As you can see, you can construct any model with a mathematical expression. Every recursive function will check that the supplied list of parameters corresponds to this expression.
+
+For example:
+
+```{r, error=TRUE}
+out <- biased_transmission(
+  params = list(X = 0.1)
+)
+
+```
+
+`q` cannot be supplied as a parameter:
+
+```{r, error=TRUE}
+out <- env_learn(
+  params = list(q = 0.01)
+)
+```
+
+**Using lists of parameters**
+
+The `multi_par_call()` allows us to pass lists of parameters in the form of data frames (i.e., one combination per row).
+
+Here we replicate Figure 11 in @henrich2001 [pp. 1006]:
+
+```{r}
+comb_mod <- recursion(
+  expr = q + 0.5*(P1 + (L-1)*q) + 0.5*q*(1-q)*(b*(1 - a) + a*(2*q - 1))
+)
+
+grid <- tidyr::crossing(
+  a = c(0, 0.1, 0.2, 0.25, 0.27),
+  b = 0.2, 
+  L = 0.98, 
+  P1 = 0.012
+)
+
+str(grid) ## list of parameters in data frame form
+
+out <- multi_par_call(grid, comb_mod, q_init = 0, tn = 150)
+
+str(out)
+
+library(ggplot2)
+
+out |> 
+  ggplot(aes(t, q, group = .id, color = factor(a))) + 
+  geom_line() + 
+  geom_hline(yintercept = 1, linetype = "dashed", color = "grey50") +
+  labs(color = "alpha")
+```
+
+## References
