@@ -3,7 +3,7 @@
 #'
 #' @param expr a mathematical expression.
 #'
-#' @return a function of class "fun."
+#' @return a function of class "rfun."
 #' @export
 #'
 #' @examples

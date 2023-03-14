@@ -101,8 +101,10 @@ plot(out, type = "l")
 
 <img src="man/figures/README-recursion-example-2.png" width="100%" />
 
+*Errors:*
+
 Every recursive function will check that the supplied list of parameters
-corresponds to this expression.
+corresponds to the mathematical expression.
 
 ``` r
 out <- biased_transmission(
@@ -130,7 +132,7 @@ out <- env_learn(
 The `multi_par_call()` allows us to pass lists of parameters in the form
 of data frames (i.e., one combination per row).
 
-Here we replicate Figure 11 in Henrich (2001, 1006):
+Here we create a similar graph to Figure 11 in Henrich (2001, 1006):
 
 ``` r
 comb_mod <- recursion(
@@ -138,24 +140,17 @@ comb_mod <- recursion(
 )
 
 grid <- tidyr::crossing(
-  a = c(0, 0.1, 0.2, 0.25, 0.27),
+  a = seq(0, 0.4, length.out = 100),
   b = 0.2, 
   L = 0.98, 
   P1 = 0.012
 )
 
-str(grid) ## list of parameters in data frame form
-#> tibble [5 × 4] (S3: tbl_df/tbl/data.frame)
-#>  $ a : num [1:5] 0 0.1 0.2 0.25 0.27
-#>  $ b : num [1:5] 0.2 0.2 0.2 0.2 0.2
-#>  $ L : num [1:5] 0.98 0.98 0.98 0.98 0.98
-#>  $ P1: num [1:5] 0.012 0.012 0.012 0.012 0.012
-
-out <- multi_par_call(grid, comb_mod, q_init = 0, tn = 150)
+out <- multi_par_call(grid, comb_mod, q_init = 0, tn = 200)
 
 str(out)
-#> 'data.frame':    755 obs. of  7 variables:
-#>  $ .id: Factor w/ 5 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
+#> 'data.frame':    20100 obs. of  7 variables:
+#>  $ .id: Factor w/ 100 levels "1","10","100",..: 1 1 1 1 1 1 1 1 1 1 ...
 #>  $ t  : int  0 1 2 3 4 5 6 7 8 9 ...
 #>  $ q  : num  0 0.006 0.0125 0.0196 0.0274 ...
 #>  $ a  : num  0 0 0 0 0 0 0 0 0 0 ...
@@ -166,11 +161,12 @@ str(out)
 library(ggplot2)
 
 out |> 
-  ggplot(aes(t, q, group = .id, color = factor(a))) + 
+  ggplot(aes(t, q, group = .id, color = a)) + 
   geom_line() + 
   geom_hline(yintercept = 1, linetype = "dashed", color = "grey50") +
   labs(color = "alpha") + 
-  theme_bw()
+  scale_color_viridis_c(option = "H") +
+  theme_bw() 
 ```
 
 <img src="man/figures/README-multi-par-example-1.png" width="100%" />

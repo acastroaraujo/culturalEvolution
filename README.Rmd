@@ -88,7 +88,9 @@ plot(out, type = "l")
 
 ```
 
-Every recursive function will check that the supplied list of parameters corresponds to this expression.
+*Errors:*
+
+Every recursive function will check that the supplied list of parameters corresponds to the mathematical expression.
 
 ```{r, error=TRUE}
 out <- biased_transmission(
@@ -112,7 +114,7 @@ out <- env_learn(
 
 The `multi_par_call()` allows us to pass lists of parameters in the form of data frames (i.e., one combination per row).
 
-Here we replicate Figure 11 in @henrich2001 [pp. 1006]:
+Here we create a similar graph to Figure 11 in @henrich2001 [pp. 1006]:
 
 ```{r multi-par-example}
 comb_mod <- recursion(
@@ -120,26 +122,26 @@ comb_mod <- recursion(
 )
 
 grid <- tidyr::crossing(
-  a = c(0, 0.1, 0.2, 0.25, 0.27),
+  a = seq(0, 0.4, length.out = 100),
   b = 0.2, 
   L = 0.98, 
   P1 = 0.012
 )
 
-str(grid) ## list of parameters in data frame form
-
-out <- multi_par_call(grid, comb_mod, q_init = 0, tn = 150)
+out <- multi_par_call(grid, comb_mod, q_init = 0, tn = 200)
 
 str(out)
 
 library(ggplot2)
 
 out |> 
-  ggplot(aes(t, q, group = .id, color = factor(a))) + 
+  ggplot(aes(t, q, group = .id, color = a)) + 
   geom_line() + 
   geom_hline(yintercept = 1, linetype = "dashed", color = "grey50") +
   labs(color = "alpha") + 
-  theme_bw()
+  scale_color_viridis_c(option = "H") +
+  theme_bw() 
+
 ```
 
 ## References
