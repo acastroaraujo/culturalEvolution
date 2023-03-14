@@ -34,7 +34,15 @@ library(culturalEvolution)
 You can construct *any* model with the `recursion()` function and a
 mathematical expression.
 
-Each of these models is a *new* function of class “recursion.”
+Each of these models is a *new* function of class “rfun.” Each of these
+new functions has the same arguments:
+
+- `params` a list of parameters that match those in the mathematical
+  expression
+
+- `q_init` the initial value for the proportion of the “cultural trait.”
+
+- `tn` the number of time periods.
 
 Here are two very simple models from Henrich (2001):
 
@@ -48,7 +56,7 @@ env_learn ## special print
 #> Recursive equation:
 #> q' = q + (1 - q) * P1 - q * P2
 #> 
-#> Parameters:
+#> Required parameters:
 #> P1, P2
 
 out <- env_learn(
@@ -79,7 +87,7 @@ biased_transmission ## special print
 #> Recursive equation:
 #> q' = q + q * (1 - q) * B
 #> 
-#> Parameters:
+#> Required parameters:
 #> B
 
 out <- biased_transmission(
@@ -96,10 +104,6 @@ plot(out, type = "l")
 Every recursive function will check that the supplied list of parameters
 corresponds to this expression.
 
-For example:
-
-- Missing parameters:
-
 ``` r
 out <- biased_transmission(
   params = list(X = 0.1)
@@ -107,13 +111,18 @@ out <- biased_transmission(
 #> Error: Missing Parameters: B
 ```
 
-- `q` cannot be supplied as a parameter:
+`q` and `t` cannot be supplied as a parameters:
 
 ``` r
 out <- env_learn(
   params = list(q = 0.01)
 )
 #> Error: The "params" list cannot contain an object named "q"
+
+out <- env_learn(
+  params = list(t = 1)
+)
+#> Error: The "params" list cannot contain an object named "t"
 ```
 
 **Using lists of parameters**

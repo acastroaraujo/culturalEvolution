@@ -7,10 +7,10 @@
 recursion(expr)
 }
 \arguments{
-\item{expr}{a mathematical expression}
+\item{expr}{a mathematical expression.}
 }
 \value{
-a function of class "recursion."
+a function of class "fun."
 }
 \description{
 Create Recursive Models

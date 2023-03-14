@@ -9,7 +9,7 @@ multi_par_call(grid, model, q_init = 0, tn = 20)
 \arguments{
 \item{grid}{a data frame of parameter values}
 
-\item{model}{a function of class "recursion."}
+\item{model}{a function of class "rfun."}
 
 \item{q_init}{the initial value for "q" (default is zero).}
 

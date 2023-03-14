@@ -1,9 +1,9 @@
 
 #' Create Recursive Models
 #'
-#' @param expr a mathematical expression
+#' @param expr a mathematical expression.
 #'
-#' @return a function of class "recursion."
+#' @return a function of class "fun."
 #' @export
 #'
 #' @examples
@@ -19,22 +19,22 @@ recursion <- function(expr) {
     out <- purrr::accumulate(
       .x = 1:tn,        ## sequence of time periods
       .init = q_init,   ## initial value for q
-      .f = function(q,...) eval(expr)
+      .f = function(q, t, ...) eval(expr)
     )
     return(structure(data.frame(t = 0:tn, q = out), params = params))
   }
-  structure(fun, class = c("recursion", "function"))
+  structure(fun, class = c("rfun", "function"))
 }
 
 #' @export
 #'
-print.recursion <- function(x, ...) {
+print.rfun <- function(x, ...) {
   eq <- environment(x)[["expr"]]
   params <- environment(x)[["par_names"]]
-  i <- which(params == "q")
+  i <- which(params %in% c("q", "t"))
   cat("Recursive equation:\n")
   cat("q' =", paste0(deparse(eq), sep = "\n\n"))
-  cat("Parameters:\n")
+  cat("Required parameters:\n")
   cat(params[-i], sep = ", ")
 }
 
@@ -42,7 +42,7 @@ print.recursion <- function(x, ...) {
 #' Run Recursive Model with Multiple Parameters
 #'
 #' @param grid a data frame of parameter values
-#' @param model a function of class "recursion."
+#' @param model a function of class "rfun."
 #' @param q_init the initial value for "q" (default is zero).
 #' @param tn the number of time periods after q_0
 #'
@@ -64,7 +64,7 @@ print.recursion <- function(x, ...) {
 multi_par_call <- function(grid, model, q_init = 0, tn = 20) {
 
   if (!("data.frame" %in% class(grid))) stop("grid must be a data frame.")
-  if (!("recursion" %in% class(model))) stop("model must be of class \"recursion.\"")
+  if (!("rfun" %in% class(model))) stop("model must be of class \"rfun.\"")
 
   parameter_list <- split(grid, row.names(grid))
 
@@ -98,9 +98,12 @@ extract_par_names <- function(expr) {
 }
 
 validate_recursion_env <- function(e, par_names) {
-  ok <- par_names %in% names(append(e[["params"]], list(q = NULL)))
+  ok <- par_names %in% names(append(e[["params"]], list(q = NULL, t = NULL)))
   if ("q" %in% names(e[["params"]])) {
     stop("The \"params\" list cannot contain an object named \"q\"", call. = FALSE)
+  }
+  if ("t" %in% names(e[["params"]])) {
+    stop("The \"params\" list cannot contain an object named \"t\"", call. = FALSE)
   }
   if (!all(ok)) {
     stop("Missing Parameters: ", paste(par_names[!ok], collapse = ", "), call. = FALSE)
