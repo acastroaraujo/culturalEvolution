@@ -45,7 +45,7 @@ library(culturalEvolution)
 
 You can construct *any* model with the `recursion()` function and a mathematical expression.
 
-Each of these models is a *new* function of class "rfun." Each of these new functions has the same arguments:
+Each of these models is a *new* function of class "rfun" with the following arguments:
 
 -   `params` a list of parameters that match those in the mathematical expression
 
