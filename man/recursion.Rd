@@ -10,7 +10,7 @@ recursion(expr)
 \item{expr}{a mathematical expression.}
 }
 \value{
-a function of class "fun."
+a function of class "rfun."
 }
 \description{
 Create Recursive Models

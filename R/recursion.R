@@ -13,7 +13,7 @@
 recursion <- function(expr) {
   expr <- substitute(expr)
   par_names <- extract_par_names(expr)
-  fun <- function(params, q_init = 0, tn = 20, ...) {
+  fun <- function(params, q_init = 0, tn = 20) {
     validate_recursion_env(environment(), par_names)
     list2env(params, envir = environment())
     out <- purrr::accumulate(
@@ -97,22 +97,26 @@ extract_par_names <- function(expr) {
   return(as.character(s[i]))
 }
 
-validate_recursion_env <- function(e, par_names) {
-  ok <- par_names %in% names(append(e[["params"]], list(q = NULL, t = NULL)))
-  if ("q" %in% names(e[["params"]])) {
+validate_recursion_env <- function(env, par_names) {
+
+  ok <- par_names %in% names(append(env[["params"]], list(q = NULL, t = NULL)))
+  if ("q" %in% names(env[["params"]])) {
     stop("The \"params\" list cannot contain an object named \"q\"", call. = FALSE)
   }
-  if ("t" %in% names(e[["params"]])) {
+  if ("t" %in% names(env[["params"]])) {
     stop("The \"params\" list cannot contain an object named \"t\"", call. = FALSE)
   }
   if (!all(ok)) {
     stop("Missing Parameters: ", paste(par_names[!ok], collapse = ", "), call. = FALSE)
   }
-  if (e[["tn"]] %% 1 != 0 | e[["tn"]] < 0) {
+  if (env[["tn"]] %% 1 != 0 | env[["tn"]] < 0) {
     stop("\"tn\" must be a positive integer", call. = FALSE)
   }
-  if (e[["q_init"]] < 0 | e[["q_init"]] > 1) {
+  if (env[["q_init"]] < 0 | env[["q_init"]] > 1) {
     stop("\"q_init\" must not be outside the [0, 1] range", call. = FALSE)
+  }
+  if (any(purrr::map_lgl(env[["params"]], \(x) length(x) != 1))) {
+    stop("Each value in \"params\" must be of length 1", call. = FALSE)
   }
 
 }
