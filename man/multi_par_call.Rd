@@ -4,14 +4,14 @@
 \alias{multi_par_call}
 \title{Run Recursive Model with Multiple Parameters}
 \usage{
-multi_par_call(grid, model, q_init = 0, tn = 20)
+multi_par_call(grid, model, init = 0, tn = 20)
 }
 \arguments{
 \item{grid}{a data frame of parameter values}
 
 \item{model}{a function of class "rfun."}
 
-\item{q_init}{the initial value for "q" (default is zero).}
+\item{init}{the initial value for "q" (default is zero).}
 
 \item{tn}{the number of time periods after q_0}
 }
@@ -24,6 +24,7 @@ Run Recursive Model with Multiple Parameters
 \examples{
 
 env_learn <- recursion(
+  var = q,
   expr = P1 + L*q
 )
 

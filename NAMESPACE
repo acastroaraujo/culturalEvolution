@@ -3,3 +3,4 @@
 S3method(print,rfun)
 export(multi_par_call)
 export(recursion)
+importFrom(rlang,":=")

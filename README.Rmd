@@ -43,13 +43,13 @@ Currently available functions:
 library(culturalEvolution)
 ```
 
-You can construct *any* model with the `recursion()` function and a mathematical expression.
+You can construct *any* model with the `recursion()` function, a mathematical expression, and the name of the "state variable."
 
 Each of these models is a *new* function of class "rfun" with the following arguments:
 
 -   `params` a list of parameters that match those in the mathematical expression
 
--   `q_init` the initial value for the proportion of the "cultural trait."
+-   `init` the initial value for the proportion of the "trait."
 
 -   `tn` the number of time periods.
 
@@ -58,6 +58,7 @@ Here are two very simple models from @henrich2001:
 ```{r recursion-example}
 
 env_learn <- recursion(
+  var = q,
   expr = q + (1 - q)*P1 - q*P2
 )
 
@@ -73,14 +74,15 @@ str(out)
 plot(out, type = "l")
 
 biased_transmission <- recursion(
-  expr = q + q*(1 - q)*B
+  var = p,
+  expr = p + p*(1 - p)*B
 )
 
 biased_transmission ## special print
 
 out <- biased_transmission(
   params = list(B = 0.1), 
-  q_init = 0.005,  ## q cannot start as zero in this model!
+  init = 0.005,  ## q cannot start as zero in this model!
   tn = 100
 )
 
@@ -98,11 +100,15 @@ out <- biased_transmission(
 )
 ```
 
-`q` and `t` cannot be supplied as a parameters:
+The "state variable" and `t` *cannot* be supplied as a parameters:
 
 ```{r, error=TRUE}
 out <- env_learn(
   params = list(q = 0.01)
+)
+
+out <- biased_transmission(
+  params = list(p = 0.01)
 )
 
 out <- env_learn(
@@ -117,7 +123,8 @@ The `multi_par_call()` allows us to pass lists of parameters in the form of data
 Here we create a similar graph to Figure 11 in @henrich2001 [pp. 1006]:
 
 ```{r multi-par-example}
-comb_mod <- recursion(
+
+comb_mod <- recursion(q,
   expr = q + 0.5*(P1 + (L-1)*q) + 0.5*q*(1-q)*(b*(1 - a) + a*(2*q - 1))
 )
 
@@ -128,7 +135,7 @@ grid <- tidyr::crossing(
   P1 = 0.012
 )
 
-out <- multi_par_call(grid, comb_mod, q_init = 0, tn = 200)
+out <- multi_par_call(grid, comb_mod, init = 0, tn = 200)
 
 str(out)
 

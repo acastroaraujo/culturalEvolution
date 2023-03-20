@@ -4,9 +4,11 @@
 \alias{recursion}
 \title{Create Recursive Models}
 \usage{
-recursion(expr)
+recursion(var, expr)
 }
 \arguments{
+\item{var}{the state variable (e.g., q)}
+
 \item{expr}{a mathematical expression.}
 }
 \value{
@@ -16,7 +18,7 @@ a function of class "rfun."
 Create Recursive Models
 }
 \examples{
-biased_transmission <- recursion(expr = q + q*(1 - q)*B)
+biased_transmission <- recursion(var = q, expr = q + q*(1 - q)*B)
 biased_transmission
 
 }

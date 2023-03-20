@@ -31,8 +31,8 @@ Currently available functions:
 library(culturalEvolution)
 ```
 
-You can construct *any* model with the `recursion()` function and a
-mathematical expression.
+You can construct *any* model with the `recursion()` function, a
+mathematical expression, and the name of the “state variable.”
 
 Each of these models is a *new* function of class “rfun” with the
 following arguments:
@@ -40,7 +40,7 @@ following arguments:
 - `params` a list of parameters that match those in the mathematical
   expression
 
-- `q_init` the initial value for the proportion of the “cultural trait.”
+- `init` the initial value for the proportion of the “trait.”
 
 - `tn` the number of time periods.
 
@@ -49,12 +49,13 @@ Here are two very simple models from Henrich (2001):
 ``` r
 
 env_learn <- recursion(
+  var = q,
   expr = q + (1 - q)*P1 - q*P2
 )
 
 env_learn ## special print
 #> Recursive equation:
-#> q' = q + (1 - q) * P1 - q * P2
+#> q' = q + (1 - q) * P1 - q * P2 
 #> 
 #> Required parameters:
 #> P1, P2
@@ -65,9 +66,9 @@ out <- env_learn(
 )
 
 str(out)
-#> 'data.frame':    101 obs. of  2 variables:
-#>  $ t: int  0 1 2 3 4 5 6 7 8 9 ...
-#>  $ q: num  0 0.308 0.502 0.624 0.701 ...
+#> tibble [101 × 2] (S3: tbl_df/tbl/data.frame)
+#>  $ t: int [1:101] 0 1 2 3 4 5 6 7 8 9 ...
+#>  $ q: num [1:101] 0 0.308 0.502 0.624 0.701 ...
 #>  - attr(*, "params")=List of 2
 #>   ..$ P1: num 0.308
 #>   ..$ P2: num 0.062
@@ -80,19 +81,20 @@ plot(out, type = "l")
 ``` r
 
 biased_transmission <- recursion(
-  expr = q + q*(1 - q)*B
+  var = p,
+  expr = p + p*(1 - p)*B
 )
 
 biased_transmission ## special print
 #> Recursive equation:
-#> q' = q + q * (1 - q) * B
+#> p' = p + p * (1 - p) * B 
 #> 
 #> Required parameters:
 #> B
 
 out <- biased_transmission(
   params = list(B = 0.1), 
-  q_init = 0.005,  ## q cannot start as zero in this model!
+  init = 0.005,  ## q cannot start as zero in this model!
   tn = 100
 )
 
@@ -110,21 +112,26 @@ corresponds to the mathematical expression.
 out <- biased_transmission(
   params = list(X = 0.1)
 )
-#> Error: Missing Parameters: B
+#> Error: B missing from the parameter list
 ```
 
-`q` and `t` cannot be supplied as a parameters:
+The “state variable” and `t` *cannot* be supplied as a parameters:
 
 ``` r
 out <- env_learn(
   params = list(q = 0.01)
 )
-#> Error: The "params" list cannot contain an object named "q"
+#> Error: the parameter list cannot contain an object named q
+
+out <- biased_transmission(
+  params = list(p = 0.01)
+)
+#> Error: the parameter list cannot contain an object named p
 
 out <- env_learn(
   params = list(t = 1)
 )
-#> Error: The "params" list cannot contain an object named "t"
+#> Error: the parameter list cannot contain an object named t
 ```
 
 **Using lists of parameters**
@@ -135,7 +142,8 @@ of data frames (i.e., one combination per row).
 Here we create a similar graph to Figure 11 in Henrich (2001, 1006):
 
 ``` r
-comb_mod <- recursion(
+
+comb_mod <- recursion(q,
   expr = q + 0.5*(P1 + (L-1)*q) + 0.5*q*(1-q)*(b*(1 - a) + a*(2*q - 1))
 )
 
@@ -146,17 +154,17 @@ grid <- tidyr::crossing(
   P1 = 0.012
 )
 
-out <- multi_par_call(grid, comb_mod, q_init = 0, tn = 200)
+out <- multi_par_call(grid, comb_mod, init = 0, tn = 200)
 
 str(out)
-#> 'data.frame':    20100 obs. of  7 variables:
+#> tibble [20,100 × 7] (S3: tbl_df/tbl/data.frame)
 #>  $ .id: Factor w/ 100 levels "1","10","100",..: 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ t  : int  0 1 2 3 4 5 6 7 8 9 ...
-#>  $ q  : num  0 0.006 0.0125 0.0196 0.0274 ...
-#>  $ a  : num  0 0 0 0 0 0 0 0 0 0 ...
-#>  $ b  : num  0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ...
-#>  $ L  : num  0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 ...
-#>  $ P1 : num  0.012 0.012 0.012 0.012 0.012 0.012 0.012 0.012 0.012 0.012 ...
+#>  $ t  : int [1:20100] 0 1 2 3 4 5 6 7 8 9 ...
+#>  $ q  : num [1:20100] 0 0.006 0.0125 0.0196 0.0274 ...
+#>  $ a  : num [1:20100] 0 0 0 0 0 0 0 0 0 0 ...
+#>  $ b  : num [1:20100] 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ...
+#>  $ L  : num [1:20100] 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 0.98 ...
+#>  $ P1 : num [1:20100] 0.012 0.012 0.012 0.012 0.012 0.012 0.012 0.012 0.012 0.012 ...
 
 library(ggplot2)
 
