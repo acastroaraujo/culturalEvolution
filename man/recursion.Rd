@@ -7,12 +7,19 @@
 recursion(var, expr)
 }
 \arguments{
-\item{var}{the state variable (e.g., q)}
+\item{var}{The state variable or "trait" proportion (e.g., q). You are not allowed to choose "t",
+which is reserved for keeping track of time.}
 
-\item{expr}{a mathematical expression.}
+\item{expr}{A recursive mathematical expression.}
 }
 \value{
-a function of class "rfun."
+A function of class "rfun", with the following arguments:
+
+\describe{
+  \item{params}{A list or data frame of parameter values.}
+  \item{init}{The initial value for the state variable (defaults to zero).}
+  \item{tn}{The number of time periods.}
+}
 }
 \description{
 Create Recursive Models

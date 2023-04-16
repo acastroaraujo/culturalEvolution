@@ -1,10 +1,18 @@
 
 #' Create Recursive Models
 #'
-#' @param var the state variable (e.g., q)
-#' @param expr a mathematical expression.
+#' @param var The state variable or "trait" proportion (e.g., q). You are not allowed to choose "t",
+#'   which is reserved for keeping track of time.
+#' @param expr A recursive mathematical expression.
 #'
-#' @return a function of class "rfun."
+#' @return A function of class "rfun", with the following arguments:
+#'
+#' \describe{
+#'   \item{params}{A list or data frame of parameter values.}
+#'   \item{init}{The initial value for the state variable (defaults to zero).}
+#'   \item{tn}{The number of time periods.}
+#' }
+#'
 #' @export
 #'
 #' @examples
@@ -12,16 +20,23 @@
 #' biased_transmission
 #'
 recursion <- function(var, expr) {
-  expr <- substitute(expr)
   sv <- as.character(substitute(var))
-  f <- make_rfun(sv, expr)
+  if (sv == "to") stop(call. = FALSE, "\"t\" isn't allowed")
+  expr <- substitute(expr)
+  fexpr <- make_rfun(sv, expr)
   rfun <- function(params, init = 0, tn = 20) {
-    validate_recursion_env(environment(), environment(f))
-    list2env(params, envir = environment(f))
-    out <- purrr::accumulate(1:tn, f, .init = init)
+    list2env(params, envir = environment(fexpr))
+    out <- purrr::accumulate(1:tn, fexpr, .init = init)
     return(structure(tibble::tibble(t = 0:tn, !!sv := out), params = params))
   }
-  return(structure(rfun, class = c("rfun", "function")))
+
+  out <- function(params, init = 0, tn = 20) {
+    validate_recursion_env(environment(), environment(fexpr))
+    params <- as.data.frame(params)
+    multi_par_call(params, rfun, init, tn)
+  }
+
+  return(structure(out, class = c("rfun", "function")))
 }
 
 make_rfun <- function(sv, expr) {
@@ -30,6 +45,17 @@ make_rfun <- function(sv, expr) {
   formals(f) <- args
   return(f)
 }
+
+multi_par_call <- function(df, rfun, init = 0, tn = 20) {
+  parameter_list <- split(df, row.names(df))
+  multi_out <- purrr::map(parameter_list, function(x) rfun(x, init, tn))
+  out <- purrr::map2(multi_out, parameter_list, dplyr::bind_cols)
+  out <- dplyr::bind_rows(out, .id = ".id")
+  out[[".id"]] <- as.factor(out[[".id"]])
+  attr(out, "params") <- NULL
+  return(out)
+}
+
 
 #' @export
 #'
@@ -42,48 +68,6 @@ print.rfun <- function(x, ...) {
   cat(paste0(env[["sv"]], "' = ", deparse(eq)), "\n\n")
   cat("Required parameters:\n")
   cat(params[-i], sep = ", ")
-}
-
-#' Run Recursive Model with Multiple Parameters
-#'
-#' @param grid a data frame of parameter values
-#' @param model a function of class "rfun."
-#' @param init the initial value for "q" (default is zero).
-#' @param tn the number of time periods after q_0
-#'
-#' @return a data frame with parameters t, q, .id, and whatever parameters where used
-#' @export
-#'
-#' @examples
-#'
-#' env_learn <- recursion(
-#'   var = q,
-#'   expr = P1 + L*q
-#' )
-#'
-#' env_learn
-#'
-#' grid <- expand.grid(P1 = seq(0, 0.5, by  = 0.1), L = seq(0.5, 1, by = 0.1))
-#'
-#' multi_par_call(grid, env_learn)
-#'
-multi_par_call <- function(grid, model, init = 0, tn = 20) {
-
-  if (!("data.frame" %in% class(grid))) stop("grid must be a data frame.")
-  if (!("rfun" %in% class(model))) stop("model must be of class \"rfun.\"")
-
-  parameter_list <- split(grid, row.names(grid))
-
-  multi_out <- purrr::map(
-    .x = parameter_list,
-    .f = function(x) model(x, init, tn)
-  )
-
-  out <- purrr::map2(multi_out, parameter_list, dplyr::bind_cols)
-  out <- dplyr::bind_rows(out, .id = ".id")
-  out[[".id"]] <- as.factor(out[[".id"]])
-  attr(out, "params") <- NULL
-  return(out)
 }
 
 

@@ -35,8 +35,6 @@ Currently available functions:
 
 -   `recursion()`
 
--   `multi_par_call()`
-
 ## Recursion
 
 ```{r setup}
@@ -45,11 +43,11 @@ library(culturalEvolution)
 
 You can construct *any* model with the `recursion()` function, a mathematical expression, and the name of the "state variable."
 
-Each of these models is a *new* function of class "rfun" with the following arguments:
+Each of these models is now a *new* function of class "rfun" with the following arguments:
 
--   `params` a list of parameters that match those in the mathematical expression
+-   `params` a list or data frame of parameters that match those in the mathematical expression.
 
--   `init` the initial value for the proportion of the "trait."
+-   `init` the proportion of the state variable or "trait" at time zero.
 
 -   `tn` the number of time periods.
 
@@ -62,7 +60,8 @@ env_learn <- recursion(
   expr = q + (1 - q)*P1 - q*P2
 )
 
-env_learn ## special print
+## special print
+env_learn 
 
 out <- env_learn(
   params = list(P1 = 0.308, P2 = 0.062), 
@@ -71,28 +70,32 @@ out <- env_learn(
 
 str(out)
 
-plot(out, type = "l")
+out |> 
+  dplyr::select(t, q) |> 
+  plot(type = "l")
 
 biased_transmission <- recursion(
   var = p,
   expr = p + p*(1 - p)*B
 )
 
-biased_transmission ## special print
+biased_transmission
 
 out <- biased_transmission(
-  params = list(B = 0.1), 
+  params = data.frame(B = 0.1), 
   init = 0.005,  ## q cannot start as zero in this model!
   tn = 100
 )
 
-plot(out, type = "l")
+out |> 
+  dplyr::select(t, p) |> 
+  plot(type = "l")
 
 ```
 
-*Errors:*
+**Errors:**
 
-Every recursive function will check that the supplied list of parameters corresponds to the mathematical expression.
+Every recursive function will check that the supplied data frame of parameters corresponds to the mathematical expression.
 
 ```{r, error=TRUE}
 out <- biased_transmission(
@@ -116,26 +119,29 @@ out <- env_learn(
 )
 ```
 
-**Using lists of parameters**
+**Using parameter data frames**
 
-The `multi_par_call()` allows us to pass lists of parameters in the form of data frames (i.e., one combination per row).
+You can supply lists of parameters in the form of data frames (i.e., one combination per row).
 
 Here we create a similar graph to Figure 11 in @henrich2001 [pp. 1006]:
 
 ```{r multi-par-example}
 
-comb_mod <- recursion(q,
+comb_mod <- recursion(
+  var = q,
   expr = q + 0.5*(P1 + (L-1)*q) + 0.5*q*(1-q)*(b*(1 - a) + a*(2*q - 1))
 )
 
 grid <- tidyr::crossing(
-  a = seq(0, 0.4, length.out = 100),
+  a = seq(0, 0.4, length.out = 200),
   b = 0.2, 
   L = 0.98, 
   P1 = 0.012
 )
 
-out <- multi_par_call(grid, comb_mod, init = 0, tn = 200)
+str(grid)
+
+out <- comb_mod(params = grid, init = 0, tn = 200)
 
 str(out)
 
