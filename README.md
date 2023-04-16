@@ -118,23 +118,34 @@ out <- biased_transmission(
 #> Error: B missing from the parameter list
 ```
 
-The “state variable” and `t` *cannot* be supplied as a parameters:
+Both the “state variable” and `t` *cannot* be supplied as a parameters:
 
 ``` r
 out <- env_learn(
-  params = list(q = 0.01)
+  params = list(q = 0.01) ## can't include state variable as parameter
 )
 #> Error: the parameter list cannot contain an object named q
 
+out <- env_learn(
+  params = list(t = 1)  ## can't include t as a parameter
+)
+#> Error: the parameter list cannot contain an object named t
+
+out <- env_learn(
+  params = list(P = 0.1) ## need to include both parameters
+)
+#> Error: P1, P2 missing from the parameter list
+
+biased_transmission
+#> Recursive equation:
+#> p' = p + p * (1 - p) * B 
+#> 
+#> Required parameters:
+#> B
 out <- biased_transmission(
   params = list(p = 0.01)
 )
 #> Error: the parameter list cannot contain an object named p
-
-out <- env_learn(
-  params = list(t = 1)
-)
-#> Error: the parameter list cannot contain an object named t
 ```
 
 **Using parameter data frames**

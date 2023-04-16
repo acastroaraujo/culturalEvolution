@@ -103,19 +103,24 @@ out <- biased_transmission(
 )
 ```
 
-The "state variable" and `t` *cannot* be supplied as a parameters:
+Both the "state variable" and `t` *cannot* be supplied as a parameters:
 
 ```{r, error=TRUE}
 out <- env_learn(
-  params = list(q = 0.01)
-)
-
-out <- biased_transmission(
-  params = list(p = 0.01)
+  params = list(q = 0.01) ## can't include state variable as parameter
 )
 
 out <- env_learn(
-  params = list(t = 1)
+  params = list(t = 1)  ## can't include t as a parameter
+)
+
+out <- env_learn(
+  params = list(P = 0.1) ## need to include both parameters
+)
+
+biased_transmission
+out <- biased_transmission(
+  params = list(p = 0.01)
 )
 ```
 
