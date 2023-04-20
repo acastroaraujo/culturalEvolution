@@ -121,6 +121,12 @@ out <- biased_transmission(
 Both the “state variable” and `t` *cannot* be supplied as a parameters:
 
 ``` r
+env_learn
+#> Recursive equation:
+#> q' = q + (1 - q) * P1 - q * P2 
+#> 
+#> Required parameters:
+#> P1, P2
 out <- env_learn(
   params = list(q = 0.01) ## can't include state variable as parameter
 )
@@ -156,7 +162,6 @@ combination per row).
 Here we create a similar graph to Figure 11 in Henrich (2001, 1006):
 
 ``` r
-
 comb_mod <- recursion(
   var = q,
   expr = q + 0.5*(P1 + (L-1)*q) + 0.5*q*(1-q)*(b*(1 - a) + a*(2*q - 1))

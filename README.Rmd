@@ -106,6 +106,7 @@ out <- biased_transmission(
 Both the "state variable" and `t` *cannot* be supplied as a parameters:
 
 ```{r, error=TRUE}
+env_learn
 out <- env_learn(
   params = list(q = 0.01) ## can't include state variable as parameter
 )
@@ -131,7 +132,6 @@ You can supply lists of parameters in the form of data frames (i.e., one combina
 Here we create a similar graph to Figure 11 in @henrich2001 [pp. 1006]:
 
 ```{r multi-par-example}
-
 comb_mod <- recursion(
   var = q,
   expr = q + 0.5*(P1 + (L-1)*q) + 0.5*q*(1-q)*(b*(1 - a) + a*(2*q - 1))

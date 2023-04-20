@@ -21,7 +21,7 @@
 #'
 recursion <- function(var, expr) {
   sv <- as.character(substitute(var))
-  if (sv == "to") stop(call. = FALSE, "\"t\" isn't allowed")
+  if (sv == "t") stop(call. = FALSE, "\'t\' isn't allowed as state variable.")
   expr <- substitute(expr)
   fexpr <- make_rfun(sv, expr)
   rfun <- function(params, init = 0, tn = 20) {
