@@ -27,7 +27,7 @@ recursion <- function(var, expr) {
   rfun <- function(params, init = 0, tn = 20) {
     list2env(params, envir = environment(fexpr))
     out <- purrr::accumulate(1:tn, fexpr, .init = init)
-    return(structure(tibble::tibble(t = 0:tn, !!sv := out), params = params))
+    return(structure(tibble::tibble(t = 0:tn, !!sv := out)))
   }
 
   out <- function(params, init = 0, tn = 20) {
@@ -36,7 +36,7 @@ recursion <- function(var, expr) {
     multi_par_call(params, rfun, init, tn)
   }
 
-  return(structure(out, class = c("rfun", "function")))
+  return(structure(out, class = c("rfun", "function"), expr = expr))
 }
 
 make_rfun <- function(sv, expr) {
@@ -52,7 +52,6 @@ multi_par_call <- function(df, rfun, init = 0, tn = 20) {
   out <- purrr::map2(multi_out, parameter_list, dplyr::bind_cols)
   out <- dplyr::bind_rows(out, .id = ".id")
   out[[".id"]] <- as.factor(out[[".id"]])
-  attr(out, "params") <- NULL
   return(out)
 }
 
