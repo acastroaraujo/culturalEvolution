@@ -106,54 +106,6 @@ out |>
 
 <img src="man/figures/README-recursion-example-2.png" width="100%" />
 
-**Errors:**
-
-Every recursive function will check that the supplied data frame of
-parameters corresponds to the mathematical expression.
-
-``` r
-out <- biased_transmission(
-  params = list(X = 0.1)
-)
-#> Error: B missing from the parameter list
-```
-
-Both the “state variable” and `t` *cannot* be supplied as a parameters:
-
-``` r
-env_learn
-#> Recursive equation:
-#> q' = q + (1 - q) * P1 - q * P2 
-#> 
-#> Required parameters:
-#> P1, P2
-out <- env_learn(
-  params = list(q = 0.01) ## can't include state variable as parameter
-)
-#> Error: the parameter list cannot contain an object named q
-
-out <- env_learn(
-  params = list(t = 1)  ## can't include t as a parameter
-)
-#> Error: the parameter list cannot contain an object named t
-
-out <- env_learn(
-  params = list(P = 0.1) ## need to include both parameters
-)
-#> Error: P1, P2 missing from the parameter list
-
-biased_transmission
-#> Recursive equation:
-#> p' = p + p * (1 - p) * B 
-#> 
-#> Required parameters:
-#> B
-out <- biased_transmission(
-  params = list(p = 0.01)
-)
-#> Error: the parameter list cannot contain an object named p
-```
-
 **Using parameter data frames**
 
 You can supply lists of parameters in the form of data frames (i.e., one
@@ -205,6 +157,66 @@ out |>
 ```
 
 <img src="man/figures/README-multi-par-example-1.png" width="100%" />
+
+**Errors:**
+
+Every recursive function will check that the supplied data frame of
+parameters corresponds to the mathematical expression.
+
+As a reminder, here are our two initial models:
+
+``` r
+env_learn
+#> Recursive equation:
+#> q' = q + (1 - q) * P1 - q * P2 
+#> 
+#> Required parameters:
+#> P1, P2
+biased_transmission
+#> Recursive equation:
+#> p' = p + p * (1 - p) * B 
+#> 
+#> Required parameters:
+#> B
+```
+
+``` r
+out <- biased_transmission(
+  params = list(X = 0.1)
+)
+#> Error: B missing from the parameter list
+```
+
+Neither the “state variable” nor `t` can be supplied as a parameters:
+
+``` r
+out <- env_learn(
+  params = list(q = 0.01) ## can't include state variable as parameter
+)
+#> Error: the parameter list cannot contain an object named q
+
+out <- env_learn(
+  params = list(t = 1)  ## can't include t as a parameter
+)
+#> Error: the parameter list cannot contain an object named t
+
+out <- env_learn(
+  params = list(P = 0.1) ## need to include both parameters
+)
+#> Error: P1, P2 missing from the parameter list
+
+out <- biased_transmission(
+  params = list(p = 0.01)
+)
+#> Error: the parameter list cannot contain an object named p
+```
+
+Finally, the “state variable” cannot be set as `t`.
+
+``` r
+recursion(var = t, expr = 1)
+#> Error: 't' isn't allowed as state variable.
+```
 
 ## References
 
