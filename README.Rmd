@@ -175,12 +175,6 @@ The "state variable" cannot be set to `t`.
 recursion(var = t, expr = 1 + a)
 ```
 
-But this is OK:
-
-```{r}
-recursion(q, expr = 3*t)
-```
-
 The expression must contain either the state variable or t.
 
 ```{r, error=TRUE}

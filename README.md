@@ -219,16 +219,6 @@ recursion(var = t, expr = 1 + a)
 #> Error: 't' is not allowed as the state variable.
 ```
 
-But this is OK:
-
-``` r
-recursion(q, expr = 3*t)
-#> Recursive equation:
-#> q' = 3 * t 
-#> 
-#> Required parameters:
-```
-
 The expression must contain either the state variable or t.
 
 ``` r
