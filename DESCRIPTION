@@ -17,4 +17,6 @@ Imports:
     rlang (>= 0.4.11),
     tibble
 Suggests: 
-    roxygen2
+    roxygen2,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

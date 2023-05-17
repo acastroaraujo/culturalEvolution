@@ -7,8 +7,8 @@
 recursion(var, expr)
 }
 \arguments{
-\item{var}{The state variable or "trait" proportion (e.g., q). You are not allowed to choose "t",
-which is reserved for keeping track of time.}
+\item{var}{The state variable or "trait" proportion (e.g., q). You are not
+allowed to choose "t", which is reserved for keeping track of time.}
 
 \item{expr}{A recursive mathematical expression.}
 }

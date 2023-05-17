@@ -62,7 +62,6 @@ env_learn <- recursion(
   expr = q + (1 - q)*P1 - q*P2
 )
 
-## special print
 env_learn 
 
 out <- env_learn(
@@ -131,9 +130,7 @@ out |>
   theme_bw() 
 ```
 
-**Errors:**
-
-Every recursive function will check that the supplied data frame of parameters corresponds to the mathematical expression.
+## **Errors**
 
 As a reminder, here are our two initial models:
 
@@ -141,6 +138,8 @@ As a reminder, here are our two initial models:
 env_learn
 biased_transmission
 ```
+
+Every recursive function will check that the supplied data frame of parameters corresponds to the mathematical expression.
 
 ```{r, error=TRUE}
 out <- biased_transmission(
@@ -168,10 +167,31 @@ out <- biased_transmission(
 )
 ```
 
-Finally, the "state variable" cannot be set as `t`.
+**Errors in creating the models:**
+
+The "state variable" cannot be set to `t`.
 
 ```{r, error=TRUE}
-recursion(var = t, expr = 1)
+recursion(var = t, expr = 1 + a)
+```
+
+But this is OK:
+
+```{r}
+recursion(q, expr = 3*t)
+```
+
+The expression must contain either the state variable or t.
+
+```{r, error=TRUE}
+recursion(m, expr = a + b)
+```
+
+But this is OK:
+
+```{r}
+recursion(m, expr = t + a)
+recursion(m, expr = m + a)
 ```
 
 ## References

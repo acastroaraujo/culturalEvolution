@@ -51,7 +51,6 @@ env_learn <- recursion(
   expr = q + (1 - q)*P1 - q*P2
 )
 
-## special print
 env_learn 
 #> Recursive equation:
 #> q' = q + (1 - q) * P1 - q * P2 
@@ -158,10 +157,7 @@ out |>
 
 <img src="man/figures/README-multi-par-example-1.png" width="100%" />
 
-**Errors:**
-
-Every recursive function will check that the supplied data frame of
-parameters corresponds to the mathematical expression.
+## **Errors**
 
 As a reminder, here are our two initial models:
 
@@ -179,6 +175,9 @@ biased_transmission
 #> Required parameters:
 #> B
 ```
+
+Every recursive function will check that the supplied data frame of
+parameters corresponds to the mathematical expression.
 
 ``` r
 out <- biased_transmission(
@@ -211,11 +210,47 @@ out <- biased_transmission(
 #> Error: the parameter list cannot contain an object named p
 ```
 
-Finally, the “state variable” cannot be set as `t`.
+**Errors in creating the models:**
+
+The “state variable” cannot be set to `t`.
 
 ``` r
-recursion(var = t, expr = 1)
-#> Error: 't' isn't allowed as state variable.
+recursion(var = t, expr = 1 + a)
+#> Error: 't' is not allowed as the state variable.
+```
+
+But this is OK:
+
+``` r
+recursion(q, expr = 3*t)
+#> Recursive equation:
+#> q' = 3 * t 
+#> 
+#> Required parameters:
+```
+
+The expression must contain either the state variable or t.
+
+``` r
+recursion(m, expr = a + b)
+#> Error: The expression must contain either "m" or "t"
+```
+
+But this is OK:
+
+``` r
+recursion(m, expr = t + a)
+#> Recursive equation:
+#> m' = t + a 
+#> 
+#> Required parameters:
+#> a
+recursion(m, expr = m + a)
+#> Recursive equation:
+#> m' = m + a 
+#> 
+#> Required parameters:
+#> a
 ```
 
 ## References

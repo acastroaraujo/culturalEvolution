@@ -30,11 +30,10 @@ validate_recursion_env <- function(env0, env1) {
   if (!all(ok)) {
     stop(paste(par_names[!ok], collapse = ", "), " missing from the parameter list", call. = FALSE)
   }
-  if (env0[["tn"]] %% 1 != 0 | env0[["tn"]] < 1) {
+  if (env0[["tn"]] %% 1 != 0 || env0[["tn"]] < 1) {
     stop("\"tn\" must be a positive integer", call. = FALSE)
   }
-  if (env0[["init"]] < 0 | env0[["init"]] > 1) {
+  if (env0[["init"]] < 0 || env0[["init"]] > 1) {
     stop("\"init\" must not be outside the [0, 1] range", call. = FALSE)
   }
 }
-

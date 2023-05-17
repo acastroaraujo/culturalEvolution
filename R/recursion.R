@@ -1,8 +1,8 @@
 
 #' Create Recursive Models
 #'
-#' @param var The state variable or "trait" proportion (e.g., q). You are not allowed to choose "t",
-#'   which is reserved for keeping track of time.
+#' @param var The state variable or "trait" proportion (e.g., q). You are not
+#'   allowed to choose "t", which is reserved for keeping track of time.
 #' @param expr A recursive mathematical expression.
 #'
 #' @return A function of class "rfun", with the following arguments:
@@ -20,20 +20,37 @@
 #' biased_transmission
 #'
 recursion <- function(var, expr) {
+
   sv <- as.character(substitute(var))
-  if (sv == "t") stop(call. = FALSE, "\'t\' isn't allowed as state variable.")
   expr <- substitute(expr)
+
+  if (sv == "t") {
+    stop(call. = FALSE, "\'t\' is not allowed as the state variable.")
+  }
+
+  if (length(extract_par_names(expr)) == 0) {
+    stop(call. = FALSE, "The expression is ill-formed.")
+  }
+
+  if (!any(c(sv, "t") %in% extract_par_names(expr))) {
+    stop(call. = FALSE, paste0("The expression must contain either \"", sv, "\" or \"t\""))
+  }
+
   fexpr <- make_rfun(sv, expr)
+
   rfun <- function(params, init = 0, tn = 20) {
     list2env(params, envir = environment(fexpr))
     out <- purrr::accumulate(1:tn, fexpr, .init = init)
     return(structure(tibble::tibble(t = 0:tn, !!sv := out)))
   }
-
   out <- function(params, init = 0, tn = 20) {
     validate_recursion_env(environment(), environment(fexpr))
     params <- as.data.frame(params)
-    multi_par_call(params, rfun, init, tn)
+    if (nrow(params) == 0) {
+      rfun(params, init, tn)
+    } else {
+      multi_par_call(params, rfun, init, tn)
+    }
   }
 
   return(structure(out, class = c("rfun", "function"), expr = expr))
@@ -67,7 +84,5 @@ print.rfun <- function(x, ...) {
   cat(paste0(env[["sv"]], "' = ", deparse(eq)), "\n\n")
   cat("Required parameters:\n")
   cat(params[-i], sep = ", ")
+  cat("\n")
 }
-
-
-
